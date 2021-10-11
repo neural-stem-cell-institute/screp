@@ -1,0 +1,37 @@
+Package: screp
+Type: Package
+Title: A Package for Enrichment Testing and Visulaization of Single Cell RNA-Seq Clusters
+Version: 1.0.0
+Author: Nathan Boles
+Maintainer: Nathan Boles <nathanboles@neuralsci.org>
+Description: Provides methods to visualize the results of Gene Ontology and 
+  REACTOME Pathway enrichment tests. The package also provides functions that perform the 
+  enrichment tests and prepare data frames compatible with the visualization functions. For 
+  GO enrichment, semantic similarity analysis is performed to group terms, and for the 
+  REACTOME pathway analysis, terms are grouped into the higher pathways in the tree 
+  structure from the REACTOME database website. For pathway analysis two annotations 
+  available from the REACTOME database are required. One is the ID to the pathway name, 
+  and the other is the pathway relationships to each other. The ID to pathway name file 
+  from REACTOME has several small errors (extra spaces,etc) that can result in NAs 
+  when prepping for visualization. An easily corrected RP file for Humans is included in the 
+  package.
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    ggplot2,
+    GO.db,
+    hypeR,
+    LSAfun,
+    reshape2,
+    rrvgo,
+    stringr,
+    Seurat
+RoxygenNote: 7.1.1
+Suggests: 
+    rmarkdown,
+    knitr
+VignetteBuilder: knitr
+Depends: 
+    R (>= 2.10),
+    foreach
