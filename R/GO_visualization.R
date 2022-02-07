@@ -28,29 +28,33 @@
 #' @export
 #' @examples GO_visualization(enrich_results$Enriched_df,markers_df=markers,goterms=goterms,numcats=10)
 GO_visualization<-function(cluster_enriched_df,markers_df=NULL,clust_list=NULL,numcats=15,GOcats=NULL,chosen_cats=NULL,org_db="org.Hs.eg.db",goterms=NULL,species_x="Homo sapiens") {
-  i<-NULL
-
-  if(is.null(goterms)) stop("A named GO annotation vector must be included with Go ids making up the vector and GO term names as the vector names")
+  i<-b<-NULL
+  
+  if(is.null(goterms)) stop("A named GO annotation vector must be included with GO ids making up the vector and GO term names as the vector names")
   if(is.null(markers_df) && is.null(clust_list)) stop("Need either a cluster gene list or a a Seurat markers data frame")
   if(is.null(markers_df)) {clust_list} else {
     x<-markers_df[markers_df$p_val_adj<0.1,]
-    clust_list<-foreach(i=0:max(as.numeric(levels(markers_df$cluster))))%do% {x[x$cluster==i,]$gene}
+    clust_list<-foreach(i=1:length(levels(markers_df$cluster)))%do% {x[x$cluster==levels(x$cluster)[i],]$gene}
+    names(clust_list)<-levels(markers$cluster)
+    clust_list<-clust_list[!isEmpty(clust_list)]
   }
-
+  
   if(is.null(GOcats)) {GOcats <- msigdb_gsets(species=species_x, category="C5", subcategory="BP")}
   cats<-GOcats$genesets
   y<-substring(names(cats),6)
-  y<-LSAfun:::breakdown(y)
-  y<-stringr:::str_squish(y)
+  y<-LSAfun::breakdown(y)
+  y<-stringr::str_squish(y)
   y<-goterms[y]
   names(cats)<-y
 
   Go.list.viz<-foreach(i=1:length(cluster_enriched_df)) %do% {
+    print(i)
     y<-rownames(cluster_enriched_df[[i]][[2]])
+    
     if(length(y)==0) {"No Enrichments"} else{
       y<-unlist(substring(y,6))
-      y<-LSAfun:::breakdown(y)
-      y<-stringr:::str_squish(y)
+      y<-LSAfun::breakdown(y)
+      y<-stringr::str_squish(y)
       y<-goterms[y]
       scores<-cluster_enriched_df[[i]][[2]]$overlap
       scores<-scores[!is.na(y)]
@@ -59,27 +63,33 @@ GO_visualization<-function(cluster_enriched_df,markers_df=NULL,clust_list=NULL,n
       y<-y[!is.na(y)]
       names(sizes)<-y
       names(scores)<-y
-      sm<-calculateSimMatrix(y,orgdb=org_db,ont="BP",method="Rel")
-      sizes<-sizes[intersect(rownames(sm),names(sizes))]
-      scores<-scores[intersect(rownames(sm),names(scores))]
-      o <- rev(order(scores, sizes, na.last = FALSE))
-      sm <- sm[o, o]
-      clustree <- cutree(hclust(as.dist(1 - sm)), h = .7)
-      clusterRep <- tapply(rownames(sm), clustree, function(x) x[which.max(scores[x])])
-      red<-data.frame(go = rownames(sm), clustree = clustree, parent = clusterRep[clustree],parentSimScore = unlist(Map(seq_len(nrow(sm)),
-                                                                                                                     clusterRep[clustree], f = function(i, j) sm[i,j])), score = scores[match(rownames(sm),
-                                                                                                                                                                                             names(scores))], size = sizes[match(rownames(sm), names(sizes))], term =  rrvgo:::getGoTerm(rownames(sm)),
-                      parentTerm = rrvgo:::getGoTerm(clusterRep[clustree]))
+      if(length(y)<=1) {"No Enrichments"} else {
+        sm<-calculateSimMatrix(y,orgdb=org_db,ont="BP",method="Rel")
+        
+        sizes<-sizes[intersect(rownames(sm),names(sizes))]
+        scores<-scores[intersect(rownames(sm),names(scores))]
+        o <- rev(order(scores, sizes, na.last = FALSE))
+        sm <- sm[o, o]
+        clustree <- cutree(hclust(as.dist(1 - sm)), h = .7)
+        clusterRep <- tapply(rownames(sm), clustree, function(x) x[which.max(scores[x])])
+        red<-data.frame(go = rownames(sm), clustree = clustree, parent = clusterRep[clustree],parentSimScore = unlist(Map(seq_len(nrow(sm)),
+                                                                                                                       clusterRep[clustree], f = function(i, j) sm[i,j])), score = scores[match(rownames(sm),
+                                                                                                                                                                                               names(scores))], size = sizes[match(rownames(sm), names(sizes))], term =  rrvgo:::getGoTerm(rownames(sm)),
+                        parentTerm = rrvgo:::getGoTerm(clusterRep[clustree]))
+      }
     }
   }
+  names(Go.list.viz)<-names(cluster_enriched_df)
+  
   df1<-foreach(i=1:length(Go.list.viz),.combine='rbind') %do% {
+    if(is.data.frame(Go.list.viz[[i]])){
     x<-Go.list.viz[[i]]
-    x$cluster<-i-1
-    x
+    x$cluster<-names(Go.list.viz)[i]
+    x} else {}
   }
   if(is.null(chosen_cats)){
     x<-foreach(i=1:length(Go.list.viz),.combine='c') %do% {
-      suppressWarnings(if(Go.list.viz[[i]]=="No Enrichments") {}else{unique(Go.list.viz[[i]]$parentTerm)})
+      suppressWarnings(if(!is.data.frame(Go.list.viz[[i]])) {}else{unique(Go.list.viz[[i]]$parentTerm)})
     }
     x<-sort(table(x),decreasing=T)
     chosen_cats<-x[1:numcats]
@@ -89,9 +99,8 @@ GO_visualization<-function(cluster_enriched_df,markers_df=NULL,clust_list=NULL,n
   x<-foreach(i=1:length(unique(df1$parentTerm))) %dopar% {
     fin<-foreach(b=1:length(Go.list.viz),.combine='c') %do% {
       g1<-Go.list.viz[[b]]
-      if(g1=="No Enrichments") {} else{
+      if(is.character(g1)) {} else{
         g1<-g1[which(g1$parentTerm==unique(df1$parentTerm)[i]),]$go}
-
     }
     unique(fin)
   }
@@ -109,16 +118,17 @@ GO_visualization<-function(cluster_enriched_df,markers_df=NULL,clust_list=NULL,n
     FDR<-g3$data$fdr
     data.frame(g3$data$label,Percentage,FDR)
   }
-
+names(G1)<-names(clust_list)
+  
   G2<-foreach(i=1:length(clust_list),.combine='rbind') %do% {
     GO_Names<-G1[[i]]$g3.data.label
     Percentage<-G1[[i]]$Percentage
-    Clusters<-as.character(rep(i-1,length(Percentage)))
+    Clusters<-as.character(rep(names(G1)[i],length(Percentage)))
     FDR<-G1[[i]]$FDR
     data.frame(GO_Names,Percentage,Clusters,FDR)
   }
   G2$Clusters<-factor(G2$Clusters,
-                      levels=as.character(0:(length(clust_list)-1)))
+                      levels=names(G1))
   y<-names(chosen_cats)
   G3<-foreach(i=1:length(y),.combine='rbind') %do% {
     G2[G2$GO_Names==y[i],]
@@ -134,7 +144,7 @@ GO_visualization<-function(cluster_enriched_df,markers_df=NULL,clust_list=NULL,n
 
   p
 
-  fin<-list(df1,G3,p)
+  fin<-list(df1,G2,p)
   names(fin)<-c("GO_sem","GO_df","plot")
   return(fin)
 }
@@ -155,17 +165,19 @@ GO_visualization<-function(cluster_enriched_df,markers_df=NULL,clust_list=NULL,n
 #' @export
 #' @examples GO_viz_choose(go_vis_res1,chosen_cats=newcats,markers_df=markers)
 
-GO_viz_choose<-function(GO_viz_results,chosen_cats,clust_list=NULL,markers_df=NULL,GOcats=NULL,species_x="Homo sapiens"){
+GO_viz_choose<-function(GO_viz_results,chosen_cats,clust_list=NULL,markers_df=NULL,GOcats=NULL,species_x="Homo sapiens", goterms=NULL){
+  i<-NULL
+  if(is.null(goterms)) stop("A named GO annotation vector must be included with GO ids making up the vector and GO term names as the vector names")
   if(is.null(markers_df) && is.null(clust_list)) stop("Need either a cluster gene list or a a Seurat markers data frame")
   if(is.null(markers_df)) {clust_list} else {
     x<-markers_df[markers_df$p_val_adj<0.1,]
-    clust_list<-foreach(i=0:max(as.numeric(levels(markers_df$cluster))))%do% {x[x$cluster==i,]$gene}
+    clust_list<-foreach(i=1:length(levels(markers_df$cluster)))%do% {x[x$cluster==levels(x$cluster)[i],]$gene}
   }
   if(is.null(GOcats)) {GOcats <- msigdb_gsets(species=species_x, category="C5", subcategory="BP")}
   cats<-GOcats$genesets
   y<-unlist(substring(names(cats),6))
-  y<-LSAfun:::breakdown(y)
-  y<-stringr:::str_squish(y)
+  y<-LSAfun::breakdown(y)
+  y<-stringr::str_squish(y)
   y<-goterms[y]
   names(cats)<-y
 
@@ -195,7 +207,7 @@ GO_viz_choose<-function(GO_viz_results,chosen_cats,clust_list=NULL,markers_df=NU
     data.frame(GO_Names,Percentage,Clusters,FDR)
   }
   G2$Clusters<-factor(G2$Clusters,
-                      levels=as.character(0:(length(clust_list)-1)))
+                      levels=levels(sclust_list))
 
   G3<-foreach(i=1:length(chosen_cats),.combine='rbind') %do% {
     G2[G2$GO_Names==chosen_cats[i],]
