@@ -44,5 +44,7 @@ This function provides a dot plot chart of the GO enrichments after semantic sim
     of enrichments based on new gene categories derived from the semantic similarity analysis.
 }
 \examples{
+\dontrun{
 GO_visualization(enrich_results$Enriched_df,markers_df=markers,goterms=goterms,numcats=10)
+}
 }

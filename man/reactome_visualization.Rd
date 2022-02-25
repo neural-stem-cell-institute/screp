@@ -24,5 +24,7 @@ returns a list with the first item in the list being a data frame used in creati
 function to generate plot using the dataframe from the reactome_prep function
 }
 \examples{
+\dontrun{
 react_vis2<-reactome_visualization(RP_ready,mRPR,path_order=z)
+}
 }

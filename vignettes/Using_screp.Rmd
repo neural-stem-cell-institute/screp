@@ -2,7 +2,7 @@
 title: "SCREP: an R package for Visualizing REACTOME Pathway and Gene Ontology Enrichment Analysis in scRNA-Seq"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{my-vignette}
+  %\VignetteIndexEntry{Using_screp}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -82,7 +82,7 @@ The enrich_results$Enriched_df object is used in the **GO_visualization** functi
 ```{r, warning=FALSE}
 ## Make the vector for the GO terms variable
 
-goterms<-AnnotationDbi:::Term(GO.db:::GOTERM)
+goterms<-AnnotationDbi::Term(GO.db::GOTERM)
 goterms<-prepGOTERMS(goterms)
 
 ## Run the GO_visualization function 
@@ -101,11 +101,11 @@ Now taking the results generated the user can then choose different Parent term 
 newcats<-names(sort(table(go_vis_res1$GO_sem$parentTerm)))[1:10]
 newcats
 
-go_vis_res2<-GO_viz_choose(go_vis_res1,chosen_cats=newcats,markers_df=markers)
+go_vis_res2<-GO_viz_choose(go_vis_res1,chosen_cats=newcats,markers_df=markers, goterms=goterms)
 ```
 
 ```{r,fig.asp=1, fig.width=8, out.width="100%"}
-go_vis_res2
+go_vis_res2$plot
 ```
 
 -----

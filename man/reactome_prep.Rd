@@ -22,5 +22,7 @@ returns a data frame for use in the reactome_visualization function
 function to make a data to use with visualization function
 }
 \examples{
+\dontrun{
 RP_ready<-reactome_prep(enrich_results$Enriched_df,RP=RP,RP_adj=mRPR)
+}
 }

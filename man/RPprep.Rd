@@ -4,13 +4,13 @@
 \alias{RPprep}
 \title{RPprep}
 \usage{
-RPprep(RP, species = "Homo")
+RPprep(RP, species_x = "Homo")
 }
 \arguments{
 \item{RP}{file downloaded from the reactome database or the provided annotation file. If using a
 a file from the reactome database some NAs will likely result and need to be addressed before continuing.  A corrected RP file for Humans is included in the package.}
 
-\item{species}{genus of target species. Default is "Homo" (human)}
+\item{species_x}{genus of target species. Default is "Homo" (human)}
 }
 \value{
 returns a data frame suitable for use in reactome_prep function
@@ -19,5 +19,7 @@ returns a data frame suitable for use in reactome_prep function
 function to prepare the Reactome Pathway file downloaded from the ReactomeDB for downstream use.
 }
 \examples{
+\dontrun{
 RP<-RPprep(RP,"Homo sapiens")
+}
 }

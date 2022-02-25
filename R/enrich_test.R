@@ -14,21 +14,27 @@
 #' @return returns a list of length 2. The first object is a list of of lists of the object dervied from the enrichment tests,
 #'           and the second is a data frame of the data used as input for the visulaization functions.
 #' @export
-#' @examples GO_and_Reactome_results<-enrich_test(seurat_markers)
+#' @examples
+#' \dontrun{
+#' GO_and_Reactome_results<-enrich_test(seurat_markers)
+#' }
 
 enrich_test<-function(markers_df=NULL,p_val=0.1,cats_list=NULL,species_x="Homo sapiens",genome_genes=23459,clust_list=NULL) {
-
+  i<-NULL
   if((is.null(markers_df) && is.null(clust_list))==TRUE) {stop("Function requires markers provided to either markers_df or clust_list")}
   if(is.null(clust_list)) {
-    x<-markers_df[markers_df$p_val_adj<p_val,]
-    clust_list<-foreach(i=0:max(as.numeric(levels(markers_df$cluster))))%do% {x[x$cluster==i,]$gene}
-    clustlength<-max(as.numeric(levels(markers_df$cluster)))
+    markers<-markers_df[markers_df$p_val_adj<p_val,]
+    clust_list<-foreach(i=1:length(levels(markers$cluster)))%do% {markers[markers$cluster==levels(markers$cluster)[i],]$gene}
+    names(clust_list)<-levels(markers$cluster)
+    clust_list<-clust_list[lengths(clust_list)>0]
+    clustlength<-length(clust_list)
   }
   if(!(is.null(markers_df))) {
-    clustlength<-max(as.numeric(levels(markers_df$cluster)))
+    markers<-markers_df[markers_df$p_val_adj<p_val,]
+    clustlength<-length(levels(markers$cluster))
   }
   if(!(is.null(clust_list))) {
-    clustlength<-length(clust_list)-1
+    clustlength<-length(clust_list)
   }
 
   if(is.null(cats_list)){
@@ -58,7 +64,7 @@ enrich_test<-function(markers_df=NULL,p_val=0.1,cats_list=NULL,species_x="Homo s
     names(x)<-c("BIOCARTA","REACTOME","KEGG","GOBP","GOMF","GOCC")
     x
   }
-  names(cluster_enriched_list)<-paste("Cluster",c(0:clustlength),sep="_")
+  names(cluster_enriched_list)<-names(clust_list)
 
   cluster_enriched_df<-foreach(i=1:length(clust_list)) %do% {
     Path1<-cluster_enriched_list[[i]][[1]]$data
@@ -72,7 +78,8 @@ enrich_test<-function(markers_df=NULL,p_val=0.1,cats_list=NULL,species_x="Homo s
     names(x)<-c("Pathways","GOBP","GOMF","GOCC")
     x
   }
-  names(cluster_enriched_df)<-paste("Cluster",c(0:clustlength),sep="_")
+  
+  names(cluster_enriched_df)<-names(clust_list)
   fin<-list(cluster_enriched_list,cluster_enriched_df)
   names(fin)<-c("Enriched_lists","Enriched_df")
   return(fin)

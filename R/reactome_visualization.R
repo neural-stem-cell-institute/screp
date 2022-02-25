@@ -15,9 +15,14 @@
 #' @returns returns a list with the first item in the list being a data frame used in creating a
 #'          plotting object and the second item being the ggplot2 object generated
 #' @export
-#' @examples react_vis2<-reactome_visualization(RP_ready,mRPR,path_order=z)
+#' @examples
+#' \dontrun{
+#' react_vis2<-reactome_visualization(RP_ready,mRPR,path_order=z)
+#' }
 
 reactome_visualization<-function(RP.df,RP_adj,RP=NULL, path_order=NULL){
+  b<-NULL
+  
   if(is.null(RP)) {print("Function needs product of RPprep function")}
 
   x1<-table(RP.df$rootPath)

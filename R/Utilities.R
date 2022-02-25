@@ -3,9 +3,13 @@
 #'
 #' internal function that acts as a ggplot color replicator helper function
 #' @param n number of colors needed
+#' @importFrom 'grDevices' hcl
 #' @return returns a vector of colors for use in plotting
 #' @export
-#' @examples gg_color_hue(8)
+#' @examples
+#' \dontrun{
+#' gg_color_hue(8)
+#' }
 
 gg_color_hue <- function(n) {
   hues = seq(15, 375, length = n + 1)
@@ -20,7 +24,10 @@ gg_color_hue <- function(n) {
 #' @param species_x genus of target species. Default is "Homo" (human)
 #' @returns returns a data frame suitable for use in reactome_prep function
 #' @export
-#' @examples RP<-RPprep(RP,"Homo sapiens")
+#' @examples
+#' \dontrun{
+#' RP<-RPprep(RP,"Homo sapiens")
+#' }
 
 
 RPprep<-function(RP,species_x="Homo"){
@@ -59,11 +66,14 @@ RPprep<-function(RP,species_x="Homo"){
 #' @importFrom foreach %do%
 #' @returns returns a data frame for use in the reactome_visualization function
 #' @export
-#' @examples RP_ready<-reactome_prep(enrich_results$Enriched_df,RP=RP,RP_adj=mRPR)
+#' @examples
+#' \dontrun{
+#' RP_ready<-reactome_prep(enrich_results$Enriched_df,RP=RP,RP_adj=mRPR)
+#' }
 
 reactome_prep<-function(cluster_enriched_df,RP,RP_adj){
 
-
+  i<-NULL
   clx<-foreach(i=1:length(cluster_enriched_df),.combine='rbind') %do% {
     x<-cluster_enriched_df[[i]]$Pathways
     x$Cluster<-i-1
