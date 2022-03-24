@@ -35,7 +35,7 @@ GO_visualization<-function(cluster_enriched_df,markers_df=NULL,clust_list=NULL,n
   if(is.null(markers_df)) {clust_list} else {
     x<-markers_df[markers_df$p_val_adj<0.1,]
     clust_list<-foreach(i=1:length(levels(markers_df$cluster)))%do% {x[x$cluster==levels(x$cluster)[i],]$gene}
-    names(clust_list)<-levels(markers$cluster)
+    names(clust_list)<-levels(markers_df$cluster)
     clust_list<-clust_list[!isEmpty(clust_list)]
   }
   
