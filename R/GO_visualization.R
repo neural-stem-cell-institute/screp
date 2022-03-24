@@ -41,7 +41,7 @@ GO_visualization<-function(cluster_enriched_df,markers_df=NULL,clust_list=NULL,n
   
   if(is.null(GOcats)) {GOcats <- msigdb_gsets(species=species_x, category="C5", subcategory="BP")}
   cats<-GOcats$genesets
-  y<-substring(names(cats),6)
+  y<-substring(names(cats),4)
   y<-LSAfun::breakdown(y)
   y<-stringr::str_squish(y)
   y<-goterms[y]
@@ -52,7 +52,7 @@ GO_visualization<-function(cluster_enriched_df,markers_df=NULL,clust_list=NULL,n
     y<-rownames(cluster_enriched_df[[i]][[2]])
     
     if(length(y)==0) {"No Enrichments"} else{
-      y<-unlist(substring(y,6))
+      y<-unlist(substring(y,4))
       y<-LSAfun::breakdown(y)
       y<-stringr::str_squish(y)
       y<-goterms[y]
@@ -175,7 +175,7 @@ GO_viz_choose<-function(GO_viz_results,chosen_cats,clust_list=NULL,markers_df=NU
   }
   if(is.null(GOcats)) {GOcats <- msigdb_gsets(species=species_x, category="C5", subcategory="BP")}
   cats<-GOcats$genesets
-  y<-unlist(substring(names(cats),6))
+  y<-unlist(substring(names(cats),4))
   y<-LSAfun::breakdown(y)
   y<-stringr::str_squish(y)
   y<-goterms[y]
