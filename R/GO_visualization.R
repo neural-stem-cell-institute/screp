@@ -207,7 +207,7 @@ GO_viz_choose<-function(GO_viz_results,chosen_cats,clust_list=NULL,markers_df=NU
     data.frame(GO_Names,Percentage,Clusters,FDR)
   }
   G2$Clusters<-factor(G2$Clusters,
-                      levels=levels(sclust_list))
+                      levels=levels(clust_list))
 
   G3<-foreach(i=1:length(chosen_cats),.combine='rbind') %do% {
     G2[G2$GO_Names==chosen_cats[i],]
