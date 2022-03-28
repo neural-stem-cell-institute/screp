@@ -65,7 +65,7 @@ reactome_prep<-function(cluster_enriched_df,RP,RP_adj){
 
 
   clx<-foreach(i=1:length(cluster_enriched_df),.combine='rbind') %do% {
-    if(dim(cluster_enriched_df[[i]]$Pathways)==0) {} else{
+    if(dim(cluster_enriched_df[[i]]$Pathways)[[1]]==0) {} else{
     x<-cluster_enriched_df[[i]]$Pathways
     x$Cluster<-i-1
     x[grep("REACTOME",x$label),]
