@@ -172,6 +172,8 @@ GO_viz_choose<-function(GO_viz_results,chosen_cats,clust_list=NULL,markers_df=NU
   if(is.null(markers_df)) {clust_list} else {
     x<-markers_df[markers_df$p_val_adj<0.1,]
     clust_list<-foreach(i=1:length(levels(markers_df$cluster)))%do% {x[x$cluster==levels(x$cluster)[i],]$gene}
+    names(clust_list)<-levels(markers_df$cluster)
+    clust_list<-clust_list[!isEmpty(clust_list)]
   }
   if(is.null(GOcats)) {GOcats <- msigdb_gsets(species=species_x, category="C5", subcategory="BP")}
   cats<-GOcats$genesets
@@ -198,7 +200,7 @@ GO_viz_choose<-function(GO_viz_results,chosen_cats,clust_list=NULL,markers_df=NU
     FDR<-g3$data$fdr
     data.frame(g3$data$label,Percentage,FDR)
   }
-
+  names(G1)<-names(clust_list)
   G2<-foreach(i=1:length(clust_list),.combine='rbind') %do% {
     GO_Names<-G1[[i]]$g3.data.label
     Percentage<-G1[[i]]$Percentage
@@ -207,7 +209,7 @@ GO_viz_choose<-function(GO_viz_results,chosen_cats,clust_list=NULL,markers_df=NU
     data.frame(GO_Names,Percentage,Clusters,FDR)
   }
   G2$Clusters<-factor(G2$Clusters,
-                      levels=levels(clust_list))
+                      levels=names(G1))
 
   G3<-foreach(i=1:length(chosen_cats),.combine='rbind') %do% {
     G2[G2$GO_Names==chosen_cats[i],]
