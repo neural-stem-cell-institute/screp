@@ -52,7 +52,7 @@ GO_visualization<-function(cluster_enriched_df,markers_df=NULL,clust_list=NULL,n
     y<-rownames(cluster_enriched_df[[i]][[2]])
     
     if(length(y)==0) {"No Enrichments"} else{
-      y<-unlist(substring(y,4))
+      y<-unlist(substring(y,6))
       y<-LSAfun::breakdown(y)
       y<-stringr::str_squish(y)
       y<-goterms[y]
