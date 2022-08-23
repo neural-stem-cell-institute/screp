@@ -3,9 +3,13 @@
 #'
 #' internal function that acts as a ggplot color replicator helper function
 #' @param n number of colors needed
+#' @importFrom 'grDevices' hcl
 #' @return returns a vector of colors for use in plotting
 #' @export
-#' @examples gg_color_hue(8)
+#' @examples
+#' \dontrun{
+#' gg_color_hue(8)
+#' }
 
 gg_color_hue <- function(n) {
   hues = seq(15, 375, length = n + 1)
@@ -20,7 +24,10 @@ gg_color_hue <- function(n) {
 #' @param species_x genus of target species. Default is "Homo" (human)
 #' @returns returns a data frame suitable for use in reactome_prep function
 #' @export
-#' @examples RP<-RPprep(RP,"Homo sapiens")
+#' @examples
+#' \dontrun{
+#' RP<-RPprep(RP,"Homo sapiens")
+#' }
 
 
 RPprep<-function(RP,species_x="Homo"){
@@ -59,17 +66,18 @@ RPprep<-function(RP,species_x="Homo"){
 #' @importFrom foreach %do%
 #' @returns returns a data frame for use in the reactome_visualization function
 #' @export
-#' @examples RP_ready<-reactome_prep(enrich_results$Enriched_df,RP=RP,RP_adj=mRPR)
+#' @examples
+#' \dontrun{
+#' RP_ready<-reactome_prep(enrich_results$Enriched_df,RP=RP,RP_adj=mRPR)
+#' }
 
 reactome_prep<-function(cluster_enriched_df,RP,RP_adj){
 
-
+  i<-NULL
   clx<-foreach(i=1:length(cluster_enriched_df),.combine='rbind') %do% {
-    if(dim(cluster_enriched_df[[i]]$Pathways)[[1]]==0) {} else{
     x<-cluster_enriched_df[[i]]$Pathways
     x$Cluster<-i-1
     x[grep("REACTOME",x$label),]
-      }
   }
   x<-strsplit(clx$label,"REACTOME_")
   x<-unlist(x)[seq(2,length(unlist(x)),2)]
@@ -126,5 +134,51 @@ getGoTerm <- function(x) {
  }
 
 
-
+ #' breakdown
+ #' 
+ #' breakdown function from LSAfun 0.6.2 to remove special characters from a character string
+ #' @param x is a character string
+ #' @return the reduced character string
+ #' @export
+breakdown <- function(x){
+   x <- tolower(x)
+   
+   ## Umlaute
+   x <- gsub(x=x,pattern="\\xe4",replacement="ae")
+   x <- gsub(x=x,pattern="\\xf6",replacement="oe")
+   x <- gsub(x=x,pattern="\\xfc",replacement="ue")
+   
+   ## Accents
+   x <- gsub(x=x,pattern="\\xe0",replacement="a")
+   x <- gsub(x=x,pattern="\\xe1",replacement="a")
+   x <- gsub(x=x,pattern="\\xe2",replacement="a")
+   
+   x <- gsub(x=x,pattern="\\xe8",replacement="e")
+   x <- gsub(x=x,pattern="\\xe9",replacement="e")
+   x <- gsub(x=x,pattern="\\xea",replacement="e")
+   
+   x <- gsub(x=x,pattern="\\xec",replacement="i")
+   x <- gsub(x=x,pattern="\\xed",replacement="i")
+   x <- gsub(x=x,pattern="\\xee",replacement="i")
+   
+   x <- gsub(x=x,pattern="\\xf2",replacement="o")
+   x <- gsub(x=x,pattern="\\xf3",replacement="o")
+   x <- gsub(x=x,pattern="\\xf4",replacement="o")
+   
+   x <- gsub(x=x,pattern="\\xf9",replacement="u")
+   x <- gsub(x=x,pattern="\\xfa",replacement="u")
+   x <- gsub(x=x,pattern="\\xfb",replacement="u")
+   
+   x <- gsub(x=x,pattern="\\xdf",replacement="ss")
+   
+   ## Convert to ASCII
+   x <- iconv(x,to="ASCII//TRANSLIT")
+   
+   ## Punctation and Blank lines
+   x <- gsub(x=x,pattern="[[:punct:]]", replacement=" ")
+   x <- gsub(x=x,pattern="\n", replacement=" ")
+   x <- gsub(x=x,pattern="\"", replacement=" ")
+   
+   return(x)  
+ }
 

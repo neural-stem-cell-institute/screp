@@ -16,5 +16,7 @@ returns a vector of colors for use in plotting
 internal function that acts as a ggplot color replicator helper function
 }
 \examples{
+\dontrun{
 gg_color_hue(8)
+}
 }

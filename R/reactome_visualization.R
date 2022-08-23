@@ -6,7 +6,7 @@
 #' @param RP_adj same data frame as used in reactome_prep function
 #' @param path_order a vector of parent pathway names from the rootName column in the RP.df. Can be used to
 #'         plot the parent pathway names in desired order along the x-axis. Default is NULL which gives a random order.
-#' @param RP data frame of Path IDS from Reactome database. IF left null uses the RP file incuded as data in the screp package.
+#' @param RP data frame of Path IDS from Reactome database. IF left null uses the RP file included as data in the screp package.
 #' @import 'foreach'
 #' @import 'ggplot2'
 #' @import 'reshape2'
@@ -15,9 +15,14 @@
 #' @returns returns a list with the first item in the list being a data frame used in creating a
 #'          plotting object and the second item being the ggplot2 object generated
 #' @export
-#' @examples react_vis2<-reactome_visualization(RP_ready,mRPR,path_order=z)
+#' @examples
+#' \dontrun{
+#' react_vis2<-reactome_visualization(RP_ready,mRPR,path_order=z)
+#' }
 
 reactome_visualization<-function(RP.df,RP_adj,RP=NULL, path_order=NULL){
+  b<-NULL
+  
   if(is.null(RP)) {print("Function needs product of RPprep function")}
 
   x1<-table(RP.df$rootPath)
@@ -40,7 +45,6 @@ reactome_visualization<-function(RP.df,RP_adj,RP=NULL, path_order=NULL){
 
   RP_numbers<-foreach(i=1:length(x),.combine='c') %do% {length(x[[i]])}
   names(RP_numbers)<-RP[names(x1),]$V2
-
 
 
   path_mat<-foreach(i=0:max(RP.df$Cluster),.combine='cbind') %do% {
@@ -72,8 +76,9 @@ reactome_visualization<-function(RP.df,RP_adj,RP=NULL, path_order=NULL){
   y1<-y$Cluster
   for( i in 0:max(RP.df$Cluster)) {y1[which(y1==i)]<-rev(gg_color_hue(max(RP.df$Cluster)+1))[i+1]}
   y$colors<-y1
-  p<-ggplot(y, aes(y=factor(Cluster), x=Path, size=percent, alpha=Tree.per,color=colors))
-  p<-p + geom_point() + geom_text(aes(label=P.N,vjust=-1), alpha=1.0, size=4)
+  y$Cluster<-factor(y$Cluster)
+  p<-ggplot(y, aes_string(y="Cluster", x="Path", size="percent", alpha="Tree.per",color="colors"))
+  p<-p + geom_point() + geom_text(aes_string(label="P.N",vjust=-1), alpha=1.0, size=4)
   p<-p + scale_alpha_continuous(range=c(0.3, 1)) + scale_size_area(max_size = 6)
   p<-p + theme_bw() + theme(axis.line = element_blank(),
                             axis.title = element_blank(),

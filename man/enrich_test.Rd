@@ -34,5 +34,7 @@ returns a list of length 2. The first object is a list of of lists of the object
 A function to streamline enrichment tests using of cluster marker genes in single cell seq after analysis with Seurat.
 }
 \examples{
+\dontrun{
 GO_and_Reactome_results<-enrich_test(seurat_markers)
+}
 }

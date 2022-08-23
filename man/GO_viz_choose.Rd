@@ -10,7 +10,8 @@ GO_viz_choose(
   clust_list = NULL,
   markers_df = NULL,
   GOcats = NULL,
-  species_x = "Homo sapiens"
+  species_x = "Homo sapiens",
+  goterms = NULL
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ GO_viz_choose(
 \item{GOcats}{product of the msigdb_gsets funciton using GOBP. Can also be user supplied annotation in the same format.}
 
 \item{species_x}{species names, default is "Homo sapiens", refer to ?msigdbr::msigdbr for available species}
+
+\item{goterms}{a vector with GOIDS as object and the GO terms as names}
 }
 \value{
 prints a plot and returns a ggplot2 object suitable for fine tuning the appearance of the plot.
@@ -33,5 +36,7 @@ prints a plot and returns a ggplot2 object suitable for fine tuning the appearan
 This function provides a dot plot chart of the GO enrichments of user defined Parent term categories from the results of GO_visualizatiohn function
 }
 \examples{
+\dontrun{
 GO_viz_choose(go_vis_res1,chosen_cats=newcats,markers_df=markers)
+}
 }
