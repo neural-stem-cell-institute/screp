@@ -11,7 +11,7 @@ reactome_visualization(RP.df, RP_adj, RP = NULL, path_order = NULL)
 
 \item{RP_adj}{same data frame as used in reactome_prep function}
 
-\item{RP}{data frame of Path IDS from Reactome database. IF left null uses the RP file incuded as data in the screp package.}
+\item{RP}{data frame of Path IDS from Reactome database. IF left null uses the RP file included as data in the screp package.}
 
 \item{path_order}{a vector of parent pathway names from the rootName column in the RP.df. Can be used to
 plot the parent pathway names in desired order along the x-axis. Default is NULL which gives a random order.}

@@ -3,6 +3,7 @@
 export(GO_visualization)
 export(GO_viz_choose)
 export(RPprep)
+export(breakdown)
 export(enrich_test)
 export(gg_color_hue)
 export(prepGOTERMS)

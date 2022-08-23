@@ -41,7 +41,7 @@ enrich_test<-function(markers_df=NULL,p_val=0.1,cats_list=NULL,species_x="Homo s
     BIOCARTA <- msigdb_gsets(species=species_x, category="C2", subcategory="CP:BIOCARTA")
     KEGG     <- msigdb_gsets(species=species_x, category="C2", subcategory="CP:KEGG")
     REACTOME <- msigdb_gsets(species=species_x, category="C2", subcategory="CP:REACTOME")
-    GOBP <- msigdb_gsets(species=species_x, category="C5", subcategory="BP")
+    GOBP <- msigdb_gsets(species=species_x, category="C5", subcategory="GO:BP")
     GOMF <- msigdb_gsets(species=species_x, category="C5", subcategory="MF")
     GOCC <- msigdb_gsets(species=species_x, category="C5", subcategory="CC")}
   else {
