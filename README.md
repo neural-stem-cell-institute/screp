@@ -4,3 +4,6 @@ The screp package provides to perform and visualize GO and pathway enrichment an
 
 to install use devtools package
 devtools:::install_github("https://github.com/neural-stem-cell-institute/screp")
+
+For a tutorial in R enter the following command after loading the library:
+vignette("Using_screp")
