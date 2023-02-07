@@ -46,9 +46,9 @@ reactome_visualization<-function(RP.df,RP_adj,RP=NULL, path_order=NULL){
   RP_numbers<-foreach(i=1:length(x),.combine='c') %do% {length(x[[i]])}
   names(RP_numbers)<-RP[names(x1),]$V2
 
-
-  path_mat<-foreach(i=0:max(RP.df$Cluster),.combine='cbind') %do% {
-    y<-table(RP.df[RP.df$Cluster==i,]$rootName)
+  clust_names<-unique(RP.df$Cluster)
+  path_mat<-foreach(i=1:length(clust_names),.combine='cbind') %do% {
+    y<-table(RP.df[RP.df$Cluster==clust_names[i],]$rootName)
     z<-setdiff(names(RP_numbers),names(y))
     z1<-rep(0,length(z))
     names(z1)<-z
@@ -56,7 +56,7 @@ reactome_visualization<-function(RP.df,RP_adj,RP=NULL, path_order=NULL){
     y<-y[names(RP_numbers)]
 
   }
-  colnames(path_mat)<-0:max(RP.df$Cluster)
+  colnames(path_mat)<-clust_names
   if(!(is.null(path_order))) {path_mat<-path_mat[path_order,]}
 
   RP_numbers<-RP_numbers[rownames(path_mat)]
@@ -73,8 +73,8 @@ reactome_visualization<-function(RP.df,RP_adj,RP=NULL, path_order=NULL){
   y1<-melt(y1)
   y$Tree.per<-y1$value
   y<-y[-(which(y$`P.N`==0)),]
-  y1<-y$Cluster
-  for( i in 0:max(RP.df$Cluster)) {y1[which(y1==i)]<-rev(gg_color_hue(max(RP.df$Cluster)+1))[i+1]}
+  y1<-as.character(y$Cluster)
+  for( i in 1:length(clust_names)) {y1[which(y1==clust_names[i])]<-rev(gg_color_hue(length(clust_names)))[i]}
   y$colors<-y1
   y$Cluster<-factor(y$Cluster)
   p<-ggplot(y, aes_string(y="Cluster", x="Path", size="percent", alpha="Tree.per",color="colors"))
